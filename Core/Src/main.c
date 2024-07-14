@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "i2c.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -54,7 +55,8 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+#define SHT40_Write (0x44 << 1)      // write address
+#define SHT40_Read ((0x44 << 1) + 1) // read address
 /* USER CODE END 0 */
 
 /**
@@ -65,7 +67,12 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
+  uint16_t num = 0;
+  uint8_t writeData[1] = {0xFD};
+  uint8_t readData[6] = {0};
+  uint16_t Temp = 0, Humi = 0;
+  double Temperature = 0;
+  double Humidity = 0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -86,12 +93,27 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
   HAL_Delay(100);
+
   // clean all shift registers data to zero
   SN74HC595_Send_Data(SN_DIG, 0x00);
   SN74HC595_Send_Data(SN_LED1, 0x00);
   SN74HC595_Send_Data(SN_LED2, 0x00);
+
+  // SHT40 read temperature and humidity
+  HAL_Delay(100);
+  HAL_I2C_Master_Transmit(&hi2c1, (uint16_t)SHT40_Write, (uint8_t *)writeData, 1, HAL_MAX_DELAY);
+  HAL_Delay(10);
+  HAL_I2C_Master_Receive(&hi2c1, (uint16_t)SHT40_Read, (uint8_t *)readData, 6, HAL_MAX_DELAY);
+
+  Temperature = (1.0 * 175 * (readData[0] * 256 + readData[1])) / 65535.0 - 45;
+  Humidity = (1.0 * 125 * (readData[3] * 256 + readData[4])) / 65535.0 - 6.0;
+
+  Temp = (uint16_t)(Temperature * 10);
+  Humi = (uint16_t)(Humidity * 10);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -101,12 +123,26 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    ShowNum(1, 1, 6);
-    ShowNum(1, 2, 6);
-    ShowNum(1, 3, 6);
-    ShowNum(2, 1, 6);
-    ShowNum(2, 2, 6);
-    ShowNum(2, 3, 6);
+
+    num++;
+		if(num < 100)
+		{
+			ShowNum(1,1,Temp/100);
+			ShowNum(1,2,Temp/ 10 % 10);
+			ShowNum(1,3,Temp%10);
+		}
+		else if(num < 200)
+		{
+			ShowNum(2,1,Humi/100);
+			ShowNum(2,2,Humi/ 10 % 10);
+			ShowNum(2,3,Humi%10);
+		}
+		else{
+			num = 0;
+			ShowNum(1,1,Temp/100);
+			ShowNum(1,2,Temp/ 10 % 10);
+			ShowNum(1,3,Temp%10);
+		}
   }
   /* USER CODE END 3 */
 }

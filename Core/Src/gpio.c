@@ -33,31 +33,33 @@
 /* USER CODE END 1 */
 
 /** Configure pins as
- * Analog
- * Input
- * Output
- * EVENT_OUT
- * EXTI
- */
+        * Analog
+        * Input
+        * Output
+        * EVENT_OUT
+        * EXTI
+*/
 void MX_GPIO_Init(void)
 {
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, LED2_SER_Pin | LED2_RCLK_Pin | LED2_SCLK_Pin | DIG_SER_Pin | DIG_RCLK_Pin | DIG_SCLK_Pin | LED1_RCLK_Pin | LED1_SCLK_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LED2_SER_Pin|LED2_RCLK_Pin|LED2_SCLK_Pin|DIG_SER_Pin
+                          |DIG_RCLK_Pin|DIG_SCLK_Pin|LED1_RCLK_Pin|LED1_SCLK_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LED1_SER_Pin | LED2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, LED1_SER_Pin|LED2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : PAPin PAPin PAPin PAPin
                            PAPin PAPin PAPin PAPin */
-  GPIO_InitStruct.Pin = LED2_SER_Pin | LED2_RCLK_Pin | LED2_SCLK_Pin | DIG_SER_Pin | DIG_RCLK_Pin | DIG_SCLK_Pin | LED1_RCLK_Pin | LED1_SCLK_Pin;
+  GPIO_InitStruct.Pin = LED2_SER_Pin|LED2_RCLK_Pin|LED2_SCLK_Pin|DIG_SER_Pin
+                          |DIG_RCLK_Pin|DIG_SCLK_Pin|LED1_RCLK_Pin|LED1_SCLK_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
@@ -86,6 +88,7 @@ void MX_GPIO_Init(void)
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI4_15_IRQn, 1, 0);
   HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
+
 }
 
 /* USER CODE BEGIN 2 */
@@ -122,10 +125,10 @@ void SN74HC595_Send_Data(unsigned char sn_num, unsigned int sendValue)
       {
         HAL_GPIO_WritePin(LED1_SER_GPIO_Port, LED1_SER_Pin, GPIO_PIN_RESET); // 低电平
       }
-      HAL_GPIO_WritePin(LED1_SCLK_GPIO_Port, LED1_SCLK_Pin, GPIO_PIN_RESET); // 产生一个SCLK上升沿
+      HAL_GPIO_WritePin(LED1_SCLK_GPIO_Port, LED1_SCLK_Pin, GPIO_PIN_RESET); // 产生一个SCLK上�?�沿
       HAL_GPIO_WritePin(LED1_SCLK_GPIO_Port, LED1_SCLK_Pin, GPIO_PIN_SET);
     }
-    HAL_GPIO_WritePin(LED1_RCLK_GPIO_Port, LED1_RCLK_Pin, GPIO_PIN_RESET); // 产生一个RCLK上升沿
+    HAL_GPIO_WritePin(LED1_RCLK_GPIO_Port, LED1_RCLK_Pin, GPIO_PIN_RESET); // 产生一个RCLK上�?�沿
     HAL_GPIO_WritePin(LED1_RCLK_GPIO_Port, LED1_RCLK_Pin, GPIO_PIN_SET);
   }
   else if (sn_num == SN_LED2)

@@ -22,32 +22,32 @@
 #define __GPIO_H__
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-  /* USER CODE BEGIN Includes */
+/* USER CODE BEGIN Includes */
   void SN74HC595_Send_Data(unsigned char sn_num, unsigned int sendValue);
   void ShowNum(uint8_t row, uint8_t column, uint8_t value);
-  /* USER CODE END Includes */
+/* USER CODE END Includes */
 
-  /* USER CODE BEGIN Private defines */
+/* USER CODE BEGIN Private defines */
 
-  /* USER CODE END Private defines */
+/* USER CODE END Private defines */
 
-  void MX_GPIO_Init(void);
+void MX_GPIO_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 #define SN_LED1 1
 #define SN_LED2 2
 #define SN_DIG 3
 
-  /* USER CODE END Prototypes */
+/* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }
 #endif
 #endif /*__ GPIO_H__ */
+
