@@ -2,6 +2,7 @@
     "files.associations": {
         "gpio.h": "c",
         "cstdint": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "tim.h": "c"
     }
 }

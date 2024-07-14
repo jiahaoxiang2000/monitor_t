@@ -20,6 +20,7 @@
 #include "main.h"
 #include "adc.h"
 #include "i2c.h"
+#include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -56,8 +57,8 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-#define SHT40_Write (0x44 << 1)      // write address
-#define SHT40_Read ((0x44 << 1) + 1) // read address
+
+struct DEVICE_PARAMTER device_paramter = {0};
 /* USER CODE END 0 */
 
 /**
@@ -68,12 +69,8 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  uint16_t num = 0;
-  uint8_t writeData[1] = {0xFD};
-  uint8_t readData[6] = {0};
-  uint16_t Temp = 0, Humi = 0;
-  double Temperature = 0;
-  double Humidity = 0;
+  float temperature = 0;
+  float humidity = 0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -82,10 +79,6 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
-  uint32_t ADC_Value = 0;
-  float Data = 0;
-  uint16_t Vol_Value = 0;
 
   /* USER CODE END Init */
 
@@ -100,35 +93,20 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_ADC1_Init();
+  MX_TIM14_Init();
   /* USER CODE BEGIN 2 */
+  // close the LED2
+  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
   HAL_Delay(100);
-
-  // clean all shift registers data to zero
-  SN74HC595_Send_Data(SN_DIG, 0x00);
+  // clean all shift registers data to zero, show digial show clean.
+  SN74HC595_Send_Data(SN_DIG, 0xFF);
   SN74HC595_Send_Data(SN_LED1, 0x00);
   SN74HC595_Send_Data(SN_LED2, 0x00);
 
-  // SHT40 read temperature and humidity
-  HAL_Delay(100);
-  HAL_I2C_Master_Transmit(&hi2c1, (uint16_t)SHT40_Write, (uint8_t *)writeData, 1, HAL_MAX_DELAY);
-  HAL_Delay(10);
-  HAL_I2C_Master_Receive(&hi2c1, (uint16_t)SHT40_Read, (uint8_t *)readData, 6, HAL_MAX_DELAY);
 
-  Temperature = (1.0 * 175 * (readData[0] * 256 + readData[1])) / 65535.0 - 45;
-  Humidity = (1.0 * 125 * (readData[3] * 256 + readData[4])) / 65535.0 - 6.0;
-
-  Temp = (uint16_t)(Temperature * 10);
-  Humi = (uint16_t)(Humidity * 10);
-
-  HAL_ADCEx_Calibration_Start(&hadc1);
-  HAL_ADC_Start(&hadc1);
-  HAL_ADC_PollForConversion(&hadc1, 50);
-  if (HAL_IS_BIT_SET(HAL_ADC_GetState(&hadc1), HAL_ADC_STATE_REG_EOC))
-  {
-    ADC_Value = HAL_ADC_GetValue(&hadc1);
-    Data = (ADC_Value * 3.3f) / 4095.0f; // TODO: use the battery need change to 3V, now is 3.3V
-  }
-  Vol_Value = (uint16_t)(Data * 100) * 2;
+  // to sleep
+  HAL_SuspendTick();                                                // stop clock tick
+  HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI); // run WFI INSTRUCTION to enter sleep mode
 
   /* USER CODE END 2 */
 
@@ -140,24 +118,27 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-    num++;
-    if (num < 100)
+    if (device_paramter.KeyStatus == KEY_SHAKE_STATE)
     {
-      ShowNum(1, 1, Vol_Value / 100);
-      ShowNum(1, 2, Vol_Value / 10 % 10);
-      ShowNum(1, 3, Vol_Value % 10);
+      HAL_Delay(10);
+      if (HAL_GPIO_ReadPin(WAKE_GPIO_Port, WAKE_Pin) == GPIO_PIN_RESET)
+      {
+        while (HAL_GPIO_ReadPin(WAKE_GPIO_Port, WAKE_Pin) == GPIO_PIN_RESET)
+          ;
+
+        SHT40_Read_RHData(&temperature, &humidity);
+        device_paramter.Temp = temperature * 10;
+        device_paramter.Humi = humidity * 10;
+        // there is open the tim14, is more accurate than the delay, is can repalce by the delay
+        HAL_TIM_Base_Start_IT(&htim14);
+        device_paramter.sleepStatus = 0;
+        device_paramter.KeyStatus = KEY_NO_PRESS;
+      }
     }
-    else if (num < 200)
+    else if (device_paramter.sleepStatus == 1)
     {
-      ShowNum(2, 1, Humi / 100);
-      ShowNum(2, 2, Humi / 10 % 10);
-      ShowNum(2, 3, Humi % 10);
-    }
-    else
-    {
-      ShowNum(1, 1, Vol_Value / 100);
-      ShowNum(1, 2, Vol_Value / 10 % 10);
-      ShowNum(1, 3, Vol_Value % 10);
+      HAL_SuspendTick();
+      HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
     }
   }
   /* USER CODE END 3 */

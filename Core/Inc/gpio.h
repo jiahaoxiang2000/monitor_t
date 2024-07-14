@@ -40,6 +40,10 @@ extern "C" {
 void MX_GPIO_Init(void);
 
 /* USER CODE BEGIN Prototypes */
+
+#define KEY_NO_PRESS 0 
+#define KEY_SHAKE_STATE 1
+
 #define SN_LED1 1
 #define SN_LED2 2
 #define SN_DIG 3

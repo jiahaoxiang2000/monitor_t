@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file    i2c.c
-  * @brief   This file provides code for the configuration
-  *          of the I2C instances.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2024 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    i2c.c
+ * @brief   This file provides code for the configuration
+ *          of the I2C instances.
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2024 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "i2c.h"
@@ -136,5 +136,19 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle)
 }
 
 /* USER CODE BEGIN 1 */
+void SHT40_Read_RHData(float *temperature, float *humidity)
+{
+  uint8_t writeData[1] = {0xFD};
+  uint8_t readData[6] = {0};
+  uint32_t tempData = 0;
+  HAL_I2C_Master_Transmit(&hi2c1, (uint16_t)SHT40_Write, (uint8_t *)writeData, 1, HAL_MAX_DELAY);
+  HAL_Delay(10);
+  HAL_I2C_Master_Receive(&hi2c1, (uint16_t)SHT40_Read, (uint8_t *)readData, 6, HAL_MAX_DELAY);
 
+  tempData = readData[0] << 8 | readData[1];
+  *temperature = (tempData * 175.0f) / 65535.0f - 45;
+
+  tempData = readData[3] << 8 | readData[4];
+  *humidity = (tempData * 125.0f) / 65535.0f - 6;
+}
 /* USER CODE END 1 */

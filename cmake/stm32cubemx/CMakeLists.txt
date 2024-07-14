@@ -25,6 +25,7 @@ target_sources(stm32cubemx INTERFACE
     ../../Core/Src/gpio.c
     ../../Core/Src/adc.c
     ../../Core/Src/i2c.c
+    ../../Core/Src/tim.c
     ../../Core/Src/stm32g0xx_it.c
     ../../Core/Src/stm32g0xx_hal_msp.c
     ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc.c

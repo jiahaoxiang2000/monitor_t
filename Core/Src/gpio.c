@@ -33,12 +33,12 @@
 /* USER CODE END 1 */
 
 /** Configure pins as
-        * Analog
-        * Input
-        * Output
-        * EVENT_OUT
-        * EXTI
-*/
+ * Analog
+ * Input
+ * Output
+ * EVENT_OUT
+ * EXTI
+ */
 void MX_GPIO_Init(void)
 {
 
@@ -50,16 +50,14 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, LED2_SER_Pin|LED2_RCLK_Pin|LED2_SCLK_Pin|DIG_SER_Pin
-                          |DIG_RCLK_Pin|DIG_SCLK_Pin|LED1_RCLK_Pin|LED1_SCLK_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LED2_SER_Pin | LED2_RCLK_Pin | LED2_SCLK_Pin | DIG_SER_Pin | DIG_RCLK_Pin | DIG_SCLK_Pin | LED1_RCLK_Pin | LED1_SCLK_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LED1_SER_Pin|LED2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, LED1_SER_Pin | LED2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : PAPin PAPin PAPin PAPin
                            PAPin PAPin PAPin PAPin */
-  GPIO_InitStruct.Pin = LED2_SER_Pin|LED2_RCLK_Pin|LED2_SCLK_Pin|DIG_SER_Pin
-                          |DIG_RCLK_Pin|DIG_SCLK_Pin|LED1_RCLK_Pin|LED1_SCLK_Pin;
+  GPIO_InitStruct.Pin = LED2_SER_Pin | LED2_RCLK_Pin | LED2_SCLK_Pin | DIG_SER_Pin | DIG_RCLK_Pin | DIG_SCLK_Pin | LED1_RCLK_Pin | LED1_SCLK_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
@@ -88,7 +86,6 @@ void MX_GPIO_Init(void)
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI4_15_IRQn, 1, 0);
   HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
-
 }
 
 /* USER CODE BEGIN 2 */
@@ -97,7 +94,9 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 {
   if (GPIO_Pin == WAKE_Pin)
   {
-    HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
+    // HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
+    device_paramter.KeyStatus = KEY_SHAKE_STATE;
+    HAL_ResumeTick();
   }
 }
 
@@ -125,10 +124,10 @@ void SN74HC595_Send_Data(unsigned char sn_num, unsigned int sendValue)
       {
         HAL_GPIO_WritePin(LED1_SER_GPIO_Port, LED1_SER_Pin, GPIO_PIN_RESET); // 低电平
       }
-      HAL_GPIO_WritePin(LED1_SCLK_GPIO_Port, LED1_SCLK_Pin, GPIO_PIN_RESET); // 产生一个SCLK上�?�沿
+      HAL_GPIO_WritePin(LED1_SCLK_GPIO_Port, LED1_SCLK_Pin, GPIO_PIN_RESET); // 产生一个SCLK上�?�沿
       HAL_GPIO_WritePin(LED1_SCLK_GPIO_Port, LED1_SCLK_Pin, GPIO_PIN_SET);
     }
-    HAL_GPIO_WritePin(LED1_RCLK_GPIO_Port, LED1_RCLK_Pin, GPIO_PIN_RESET); // 产生一个RCLK上�?�沿
+    HAL_GPIO_WritePin(LED1_RCLK_GPIO_Port, LED1_RCLK_Pin, GPIO_PIN_RESET); // 产生一个RCLK上�?�沿
     HAL_GPIO_WritePin(LED1_RCLK_GPIO_Port, LED1_RCLK_Pin, GPIO_PIN_SET);
   }
   else if (sn_num == SN_LED2)
@@ -169,6 +168,16 @@ void SN74HC595_Send_Data(unsigned char sn_num, unsigned int sendValue)
   }
 }
 
+/* 64Mhz clock，ulCount=1，function run 3 cycles，delay=3*1/64us */
+void SysCtlDelay(unsigned long ulCount)
+{
+  __asm__ __volatile__(
+      "1: sub %0, %0, #1\n"
+      "bne 1b"
+      : "=r"(ulCount)
+      : "0"(ulCount));
+}
+
 /**
  * @brief Displays a number on a 7-segment LED display.
  *
@@ -200,6 +209,7 @@ void ShowNum(uint8_t row, uint8_t column, uint8_t value)
     default:
       break;
     }
+    SysCtlDelay(1000); // 50us
     SN74HC595_Send_Data(SN_LED1, 0x00);
   }
   else
@@ -221,6 +231,7 @@ void ShowNum(uint8_t row, uint8_t column, uint8_t value)
     default:
       break;
     }
+    SysCtlDelay(1000);
     SN74HC595_Send_Data(SN_LED2, 0x00);
   }
 }
