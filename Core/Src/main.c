@@ -20,6 +20,7 @@
 #include "main.h"
 #include "i2c.h"
 #include "gpio.h"
+#include "stdint.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -125,24 +126,25 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
     num++;
-		if(num < 100)
-		{
-			ShowNum(1,1,Temp/100);
-			ShowNum(1,2,Temp/ 10 % 10);
-			ShowNum(1,3,Temp%10);
-		}
-		else if(num < 200)
-		{
-			ShowNum(2,1,Humi/100);
-			ShowNum(2,2,Humi/ 10 % 10);
-			ShowNum(2,3,Humi%10);
-		}
-		else{
-			num = 0;
-			ShowNum(1,1,Temp/100);
-			ShowNum(1,2,Temp/ 10 % 10);
-			ShowNum(1,3,Temp%10);
-		}
+    if (num < 100)
+    {
+      ShowNum(1, 1, Temp / 100);
+      ShowNum(1, 2, Temp / 10 % 10);
+      ShowNum(1, 3, Temp % 10);
+    }
+    else if (num < 200)
+    {
+      ShowNum(2, 1, Humi / 100);
+      ShowNum(2, 2, Humi / 10 % 10);
+      ShowNum(2, 3, Humi % 10);
+    }
+    else
+    {
+      num = 0;
+      ShowNum(1, 1, Temp / 100);
+      ShowNum(1, 2, Temp / 10 % 10);
+      ShowNum(1, 3, Temp % 10);
+    }
   }
   /* USER CODE END 3 */
 }
