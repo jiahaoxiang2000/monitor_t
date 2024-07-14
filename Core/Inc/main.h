@@ -59,6 +59,7 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define WAKE_Pin GPIO_PIN_5
 #define WAKE_GPIO_Port GPIOB
+#define WAKE_EXTI_IRQn EXTI4_15_IRQn
 #define LED2_Pin GPIO_PIN_7
 #define LED2_GPIO_Port GPIOB
 
