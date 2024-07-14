@@ -18,9 +18,9 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "i2c.h"
 #include "gpio.h"
-#include "stdint.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -83,6 +83,10 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
+  uint32_t ADC_Value = 0;
+  float Data = 0;
+  uint16_t Vol_Value = 0;
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -95,6 +99,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
   HAL_Delay(100);
 
@@ -115,6 +120,16 @@ int main(void)
   Temp = (uint16_t)(Temperature * 10);
   Humi = (uint16_t)(Humidity * 10);
 
+  HAL_ADCEx_Calibration_Start(&hadc1);
+  HAL_ADC_Start(&hadc1);
+  HAL_ADC_PollForConversion(&hadc1, 50);
+  if (HAL_IS_BIT_SET(HAL_ADC_GetState(&hadc1), HAL_ADC_STATE_REG_EOC))
+  {
+    ADC_Value = HAL_ADC_GetValue(&hadc1);
+    Data = (ADC_Value * 3.3f) / 4095.0f; // TODO: use the battery need change to 3V, now is 3.3V
+  }
+  Vol_Value = (uint16_t)(Data * 100) * 2;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -128,9 +143,9 @@ int main(void)
     num++;
     if (num < 100)
     {
-      ShowNum(1, 1, Temp / 100);
-      ShowNum(1, 2, Temp / 10 % 10);
-      ShowNum(1, 3, Temp % 10);
+      ShowNum(1, 1, Vol_Value / 100);
+      ShowNum(1, 2, Vol_Value / 10 % 10);
+      ShowNum(1, 3, Vol_Value % 10);
     }
     else if (num < 200)
     {
@@ -140,10 +155,9 @@ int main(void)
     }
     else
     {
-      num = 0;
-      ShowNum(1, 1, Temp / 100);
-      ShowNum(1, 2, Temp / 10 % 10);
-      ShowNum(1, 3, Temp % 10);
+      ShowNum(1, 1, Vol_Value / 100);
+      ShowNum(1, 2, Vol_Value / 10 % 10);
+      ShowNum(1, 3, Vol_Value % 10);
     }
   }
   /* USER CODE END 3 */
