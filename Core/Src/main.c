@@ -71,6 +71,9 @@ int main(void)
   /* USER CODE BEGIN 1 */
   float temperature = 0;
   float humidity = 0;
+  uint32_t ADC_Value = 0;
+  float Data = 0;
+  uint16_t Vol_Value = 0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -103,6 +106,10 @@ int main(void)
   SN74HC595_Send_Data(SN_LED1, 0x00);
   SN74HC595_Send_Data(SN_LED2, 0x00);
 
+  // open ADC
+  HAL_ADCEx_Calibration_Start(&hadc1);
+  HAL_ADC_Start(&hadc1);
+  HAL_ADC_PollForConversion(&hadc1, 50);
 
   // to sleep
   HAL_SuspendTick();                                                // stop clock tick
@@ -125,10 +132,23 @@ int main(void)
       {
         while (HAL_GPIO_ReadPin(WAKE_GPIO_Port, WAKE_Pin) == GPIO_PIN_RESET)
           ;
-
         SHT40_Read_RHData(&temperature, &humidity);
         device_paramter.Temp = temperature * 10;
         device_paramter.Humi = humidity * 10;
+        // get the battery voltage
+        if (HAL_IS_BIT_SET(HAL_ADC_GetState(&hadc1), HAL_ADC_STATE_REG_EOC))
+        {
+          ADC_Value = HAL_ADC_GetValue(&hadc1);
+          Data = (ADC_Value * 3.3f) / 4095.0f; // TODO: use the battery need change to 3V, now is 3.3V
+        }
+        Vol_Value = (uint16_t)(Data * 100) * 2;
+
+        // if the Vol_Value is less than 10, then show the LED2
+        if (Vol_Value < 10)
+        {
+          HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
+        }
+
         // there is open the tim14, is more accurate than the delay, is can repalce by the delay
         HAL_TIM_Base_Start_IT(&htim14);
         device_paramter.sleepStatus = 0;
@@ -137,6 +157,9 @@ int main(void)
     }
     else if (device_paramter.sleepStatus == 1)
     {
+      // clean LED2 show, LED2 is for battery show
+      HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
+
       HAL_SuspendTick();
       HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
     }
