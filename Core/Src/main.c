@@ -139,7 +139,7 @@ int main(void)
         if (HAL_IS_BIT_SET(HAL_ADC_GetState(&hadc1), HAL_ADC_STATE_REG_EOC))
         {
           ADC_Value = HAL_ADC_GetValue(&hadc1);
-          Data = (ADC_Value * 3.3f) / 4095.0f; // TODO: use the battery need change to 3V, now is 3.3V
+          Data = (ADC_Value * 3.0f) / 4095.0f; // 3.0 is the VDDA voltage
         }
         Vol_Value = (uint16_t)(Data * 100) * 2;
 
