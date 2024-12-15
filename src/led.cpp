@@ -26,7 +26,7 @@ void display_update() {
 void setupLEDTimer() {
     // Configure TIM14 for 2ms interval (500Hz)
     displayTimer = new HardwareTimer(TIM14);
-    displayTimer->setOverflow(40, MICROSEC_FORMAT); // 40ms interval
+    displayTimer->setOverflow(4000, MICROSEC_FORMAT); // 40ms interval
     displayTimer->attachInterrupt(display_update);
     displayTimer->resume();
 }
