@@ -81,7 +81,7 @@ void ShowNum(uint8_t row, uint8_t column, uint8_t value)
     {
     case 1:
       SN74HC595_Send_Data(SN_DIG, 0xFE);
-      SN74HC595_Send_Data(SN_LED1, sgh_value[value]);
+      SN74HC595_Send_Data(SN_LED1, sgh_value[value] );
       break;
     case 2:
       SN74HC595_Send_Data(SN_DIG, 0xFD);
@@ -95,8 +95,9 @@ void ShowNum(uint8_t row, uint8_t column, uint8_t value)
       break;
     }
     // delayMicroseconds(50);  // Replace SysCtlDelay(1000)
-    // SysCtlDelay(1000); // 50us
-    // SN74HC595_Send_Data(SN_LED1, 0x00);
+    // dynamic scan show, need to delay 50us
+    SysCtlDelay(1000); // 50us
+    SN74HC595_Send_Data(SN_LED1, 0x00);
   }
   else
   {

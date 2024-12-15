@@ -20,6 +20,7 @@ void setup() {
     enableDisplay(true);
     setDisplayNumber(1, 1, 1);
     setDisplayNumber(1, 2, 1);
+    setDisplayNumber(1, 3, 1);
     setDisplayNumber(2, 1, 1);
  digitalWrite(LED_BLINK, LOW);
 }
