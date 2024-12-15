@@ -30,12 +30,21 @@ void loop() {
 
     if (sht.readSample()) {
    
-      setDisplayNumber(1, 1, sht.getTemperature() / 100);
-      setDisplayNumber(1, 2, (static_cast<int>(sht.getTemperature()) / 10) % 10);
-      setDisplayNumber(1, 3, static_cast<int>(sht.getTemperature()) % 10);
-    } else{
-     setDisplayNumber(2, 1, 1);
+      float temp = sht.getTemperature();
+      int wholeNumber = static_cast<int>(temp);
+      int decimal = static_cast<int>((temp - wholeNumber) * 10);  // Get first decimal place
 
-    }
+      setDisplayNumber(1, 1, wholeNumber / 10);     // First digit of whole number
+      setDisplayNumber(1, 2, wholeNumber % 10);     // Second digit of whole number
+      setDisplayNumber(1, 3, decimal);              // Decimal place
+
+      float humi = sht.getHumidity();
+      wholeNumber = static_cast<int>(humi);
+      decimal = static_cast<int>((humi - wholeNumber) * 10);  // Get first decimal place
+
+      setDisplayNumber(2, 1, wholeNumber / 10);     // First digit of whole number
+      setDisplayNumber(2, 2, wholeNumber % 10);     // Second digit of whole number
+      setDisplayNumber(2, 3, decimal);              // Decimal place
+    } 
 
 }
