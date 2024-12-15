@@ -2,6 +2,7 @@
 #include <Wire.h>
 #include "pins_arduino.h"
 #include "helpers.h"
+#include "led.h"
 
 struct DeviceParameter {
   uint16_t Temp;
@@ -15,11 +16,11 @@ void setup() {
  pinMode(LED_BLINK, OUTPUT);
  initPins();
  cleanLED();
-     SN74HC595_Send_Data(SN_DIG, 0xfb);
- ShowNum(1, 1, 6);
-
- ShowNum(1, 2, 6);
- ShowNum(1, 3, 6);
+    setupLEDTimer();
+    enableDisplay(true);
+    setDisplayNumber(1, 1, 1);
+    setDisplayNumber(1, 2, 1);
+    setDisplayNumber(2, 1, 1);
  digitalWrite(LED_BLINK, LOW);
 }
 
