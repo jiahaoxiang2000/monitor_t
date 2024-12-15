@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include "pins_arduino.h"
+#include "helpers.h"
 
 struct DeviceParameter {
   uint16_t Temp;
@@ -9,20 +10,21 @@ struct DeviceParameter {
   uint8_t KeyStatus;
 } device_parameter;
 
-const uint16_t sgh_value[11] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F, 0x80};
-volatile bool displayUpdate = false;
-
-
-void SN74HC595_Send_Data(uint8_t sn_num, uint8_t sendValue);
-void ShowNum(uint8_t row, uint8_t column, uint8_t value);
-void SHT40_Read_RHData(float *temperature, float *humidity);
 
 void setup() {
  pinMode(LED_BLINK, OUTPUT);
+ initPins();
+ cleanLED();
+     SN74HC595_Send_Data(SN_DIG, 0xfb);
+ ShowNum(1, 1, 6);
+
+ ShowNum(1, 2, 6);
+ ShowNum(1, 3, 6);
  digitalWrite(LED_BLINK, LOW);
 }
 
 void loop() {
  digitalWrite(LED_BLINK, !digitalRead(LED_BLINK));
     delay(1000);
+
 }

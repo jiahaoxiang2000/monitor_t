@@ -5,9 +5,9 @@
 #define LED_BLINK PB7 // LED Blink Pin
 
 // LED Matrix Control Pins
-#define LED1_SER_PIN   PB0
-#define LED1_RCLK_PIN  PA7
-#define LED1_SCLK_PIN  PA6
+#define LED1_SER_PIN   PB2
+#define LED1_RCLK_PIN  PA8
+#define LED1_SCLK_PIN  PA9
 
 #define LED2_SER_PIN   PA0
 #define LED2_RCLK_PIN  PA1
