@@ -125,7 +125,7 @@ void ShowNum(uint8_t row, uint8_t column, uint8_t value)
 
 void cleanLED() {
    // clean all shift registers data to zero, show digial show clean.
-  SN74HC595_Send_Data(SN_DIG, 0xFF);
+  SN74HC595_Send_Data(SN_DIG, 0xff);
   SN74HC595_Send_Data(SN_LED1, 0x00);
   SN74HC595_Send_Data(SN_LED2, 0x00);
 }

@@ -19,7 +19,7 @@
 
 // Other Control Pins
 #define LED2_PIN       PB3
-#define WAKE_PIN       PB4
+#define WAKE_PIN       PB5
 #define BAT_ADC_PIN    PB1
 
 // I2C Pins
